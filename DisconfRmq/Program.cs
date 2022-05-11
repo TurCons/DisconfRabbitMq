@@ -8,22 +8,36 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Sending 100 messages to RMQ!");
-
-            var rmqSender = new RabbitMqSender();
-            for (int i = 0; i < 100; i++)
+            var host = Environment.GetEnvironmentVariable("RmqHost");
+            
+            if (!int.TryParse(Environment.GetEnvironmentVariable("RmqPort"), out int port))
             {
-                rmqSender.SendMessage($"Message {i} !!!");
+                port = 5672;
+            }
+            
+            var userName = Environment.GetEnvironmentVariable("RmqUserName");
+            var password = Environment.GetEnvironmentVariable("RmqPassword");
+
+
+            // отправка пачки сообщений в кролик.
+            var rmqSender = new RabbitMqSender(host, port, userName, password);
+            Console.WriteLine("Sending 10 messages to RMQ!");
+
+            for (int i = 0; i < 10; i++)
+            {
+                rmqSender.SendMessage($"Message {i} !!!", "ex1", "");
             }
 
             Console.WriteLine("Sended messages to RMQ!");
-            /*
-            RabbitMqListener rabbitMqListener = new RabbitMqListener();
+            
+            // прием пачки сообщений из кролика
+            RabbitMqListener rabbitMqListener = new RabbitMqListener(host, port, userName, password, "q2");
 
             var cancellationToken = new CancellationToken();
 
             rabbitMqListener.StartAsync(cancellationToken);
-            */
+            
+
             Console.ReadKey(true);
         }
     }

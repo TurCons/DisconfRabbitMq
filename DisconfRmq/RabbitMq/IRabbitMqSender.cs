@@ -2,7 +2,8 @@
 {
 	public interface IRabbitMqSender
 	{
-		void SendMessage(object obj);
-		void SendMessage(string message);
+		void SendMessage(object obj, string exchangeName, string routingKey);
+
+		void SendMessage(string message, string exchangeName, string routingKey);
 	}
 }

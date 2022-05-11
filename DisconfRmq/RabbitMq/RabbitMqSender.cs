@@ -8,21 +8,25 @@
 
 	public class RabbitMqSender : IRabbitMqSender
 	{
-		public void SendMessage(object obj)
+		private ConnectionFactory _factory;
+
+		public RabbitMqSender(string host, int port, string username, string password)
 		{
-			var message = JsonSerializer.Serialize(obj);
-			SendMessage(message);
+			_factory  = new ConnectionFactory { HostName = host, Port = port, UserName = username, Password = password };
 		}
 
-		public void SendMessage(string message)
+		public void SendMessage(object obj, string exchangeName, string routingKey)
 		{
-			// Не забудьте вынести значения "localhost" и "MyQueue"
-			// в файл конфигурации
-			var factory = new ConnectionFactory() { HostName = "localhost" };
-			using (var connection = factory.CreateConnection())
+			var message = JsonSerializer.Serialize(obj);
+			SendMessage(message, exchangeName, routingKey);
+		}
+
+		public void SendMessage(string message, string exchangeName, string routingKey)
+		{
+			using (var connection = _factory.CreateConnection())
 			using (var channel = connection.CreateModel())
 			{
-				string queueName = "q1"; // "queue-" + Guid.NewGuid().ToString();
+				// string queueName = "q1"; // "queue-" + Guid.NewGuid().ToString();
 				/*
 				channel.QueueDeclare(queue: queueName,
 							   durable: false,
@@ -37,8 +41,8 @@
 				basicProperties.Headers = new Dictionary<string, object>();
 				basicProperties.Headers.Add("qwe", "qwe123");
 
-				channel.BasicPublish(exchange: "ex2",
-							   routingKey: "",
+				channel.BasicPublish(exchange: exchangeName,
+							   routingKey: routingKey,
 							   basicProperties: basicProperties,
 							   body: body);
 			}

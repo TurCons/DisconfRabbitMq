@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "DisconfRmq": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "RmqHost": "localhost",
+        "RmqPort": "5672",
+        "RmqUserName": "guest",
+        "RmqPassword": "guest"
+      }
+    }
+  }
+}

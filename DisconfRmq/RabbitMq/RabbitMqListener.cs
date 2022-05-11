@@ -1,28 +1,28 @@
 ﻿namespace DisconfRmq.RabbitMq
 {
+	using System;
+	using System.Text;
+	using System.Threading;
+	using System.Threading.Tasks;
+	
 	using RabbitMQ.Client.Events;
 	using RabbitMQ.Client;
-	using System.Threading.Tasks;
-	using System.Threading;
 	using Microsoft.Extensions.Hosting;
-	using System.Text;
-	using System.Diagnostics;
-	using System;
 
 
 	public class RabbitMqListener : BackgroundService
 	{
 		private IConnection _connection;
 		private IModel _channel;
+		private string _queueName;
 
-		public RabbitMqListener()
+		public RabbitMqListener(string host, int port, string username, string password, string queueName)
 		{
-			// Не забудьте вынести значения "localhost" и "MyQueue"
-			// в файл конфигурации
-			var factory = new ConnectionFactory { HostName = "localhost" };
+			var factory = new ConnectionFactory { HostName = host, Port = port, UserName = username, Password = password };
 			_connection = factory.CreateConnection();
 			_channel = _connection.CreateModel();
-			//_channel.QueueDeclare(queue: "q1", durable: false, exclusive: false, autoDelete: false, arguments: null);
+			_queueName = queueName;
+			//_channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 		}
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,7 +41,7 @@
 			};
 
 			bool autoAck = false;
-			_channel.BasicConsume("q1", autoAck, consumer);
+			_channel.BasicConsume(_queueName, autoAck, consumer);
 
 			return Task.CompletedTask;
 		}
