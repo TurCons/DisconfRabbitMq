@@ -20,25 +20,30 @@
 
 
             // отправка пачки сообщений в кролик.
+
             var rmqSender = new RabbitMqSender(host, port, userName, password);
             Console.WriteLine("Sending 10 messages to RMQ!");
 
             for (int i = 0; i < 10; i++)
             {
-                rmqSender.SendMessage($"Message {i} !!!", "ex1", "");
+                rmqSender.SendMessage($"Message {i} !!!", "exchange1", "routingKey1");
             }
+            Console.WriteLine("Sended messages to exchange1.routingKey1.");
 
-            Console.WriteLine("Sended messages to RMQ!");
+            for (int i = 0; i < 10; i++)
+            {
+                rmqSender.SendMessage($"Message {i} !!!", "exchange1", "routingKey2");
+            }
+            Console.WriteLine("Sended messages to exchange1.routingKey2.");
             
             // прием пачки сообщений из кролика
-            RabbitMqListener rabbitMqListener = new RabbitMqListener(host, port, userName, password, "q2");
-
+            RabbitMqListener rabbitMqListener = new RabbitMqListener(host, port, userName, password, "queue1");
             var cancellationToken = new CancellationToken();
-
             rabbitMqListener.StartAsync(cancellationToken);
             
 
-            Console.ReadKey(true);
+            // Console.ReadKey(true);
+            Console.Read();
         }
     }
 }
