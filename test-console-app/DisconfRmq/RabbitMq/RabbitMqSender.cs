@@ -29,60 +29,30 @@
 			_channel.Close();
         }
 
-        public void SendMessage(object obj, string exchangeName, string routingKey, bool newConnection)
+        public void SendMessage(object obj, string exchangeName, string routingKey)
 		{
 			var message = JsonSerializer.Serialize(obj);
-
-			if (newConnection) {
-				SendMessageWithNewConnection(message, exchangeName, routingKey);
-			} else {
-				SendMessageWithoutNewConnection(message, exchangeName, routingKey);
-			} 
+			SendMessage(message, exchangeName, routingKey);
 		}
 
-		public void SendMessageWithNewConnection(string message, string exchangeName, string routingKey)
+		public void SendMessage(string message, string exchangeName, string routingKey)
 		{
-			using (var connection = _factory.CreateConnection())
-			using (var channel = connection.CreateModel())
-			{
-				// string queueName = "q1"; // "queue-" + Guid.NewGuid().ToString();
-				/*
-				channel.QueueDeclare(queue: queueName,
-							   durable: false,
-							   exclusive: false,
-							   autoDelete: false,
-							   arguments: null);
-				*/
+			// string queueName = "q1"; // "queue-" + Guid.NewGuid().ToString();
+			// _channel.QueueDeclare(queue: queueName,
+			// 				durable: false,
+			// 				exclusive: false,
+			// 				autoDelete: false,
+			// 				arguments: null);
 
-				var body = Encoding.UTF8.GetBytes(message);
+			var body = Encoding.UTF8.GetBytes(message);
 
-				var basicProperties = channel.CreateBasicProperties();
-				basicProperties.Headers = new Dictionary<string, object>();
-				basicProperties.Headers.Add("qwe", "qwe123");
-				basicProperties.Headers.Add("sendedType", "newChannel");
+			var basicProperties = _channel.CreateBasicProperties();
+			basicProperties.Headers = new Dictionary<string, object>();
+			basicProperties.Headers.Add("qwe", "qwe123");
+			basicProperties.Headers.Add("sendedType", "channelInConstructor");
+			basicProperties.DeliveryMode = 2;
 
-				channel.BasicPublish(exchange: exchangeName,
-							   routingKey: routingKey,
-							   basicProperties: basicProperties,
-							   body: body);
-			}
-		}
-
-		public void SendMessageWithoutNewConnection(string message, string exchangeName, string routingKey)
-		{
-				var body = Encoding.UTF8.GetBytes(message);
-
-				var basicProperties = _channel.CreateBasicProperties();
-				basicProperties.Headers = new Dictionary<string, object>();
-				basicProperties.Headers.Add("qwe", "qwe123");
-				basicProperties.Headers.Add("sendedType", "channelInConstructor");
-				basicProperties.DeliveryMode = 2;
-
-				_channel.BasicPublish(exchange: exchangeName,
-							   routingKey: routingKey,
-							   basicProperties: basicProperties,
-							   body: body);
-
+			_channel.BasicPublish(exchangeName, routingKey, basicProperties, body);
 		}
 	}
 }
