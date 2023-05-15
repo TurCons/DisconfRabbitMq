@@ -22,23 +22,23 @@
             var rmqSender = new RabbitMqSender(host, port, userName, password);
             Console.WriteLine("Sending messages to RMQ!");
 
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 10; i++)
             {
                 rmqSender.SendMessage($"Message {i} !!!", "exchange1", "routingKey1");
             }
             Console.WriteLine("Sended messages to exchange1.routingKey1.");
 
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var testObject = new TestDtoClass();
-                rmqSender.SendMessage(testObject, "exchange1", "routingKey2");
+                rmqSender.SendMessage(testObject, "exchange2", "routingKey2");
             }
             Console.WriteLine("Sended messages to exchange1.routingKey2.");
             
             // прием пачки сообщений из кролика
-            // RabbitMqListener rabbitMqListener = new RabbitMqListener(host, port, userName, password, "queue1");
-            // var cancellationToken = new CancellationToken();
-            // rabbitMqListener.StartAsync(cancellationToken);
+            RabbitMqListener rabbitMqListener = new RabbitMqListener(host, port, userName, password, "queue1");
+            var cancellationToken = new CancellationToken();
+            rabbitMqListener.StartAsync(cancellationToken);
 
             // Console.ReadKey(true);
             Console.Read();
