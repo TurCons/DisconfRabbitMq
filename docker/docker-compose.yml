@@ -1,0 +1,13 @@
+version: '3'
+services:
+  RabbitMq:
+    image: rabbitmq:3-management
+    hostname: rabbit1
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - DisconfRmqStorage1:/var/lib/rabbitmq
+
+volumes:
+  DisconfRmqStorage1:
